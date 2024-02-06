@@ -8,23 +8,26 @@ const session = require('express-session');
 const config = require('./config/database');
 
 // Connexion base de donnée
-mongoose.connect(config.database);
+const MONGODB_URL  = "mongodb+srv://SedraRan:Ran19SedH@gestiodepence.ocz6e5w.mongodb.net/salon_de_beaute";
+mongoose
+    .connect(MONGODB_URL)
+    .then((result) =>{
+        if(result){
+            console.log("server found and connected to mongodb");
+            app.listen(3001);
+        }
+    })
+    .catch((error)=>{
+        console.log(error);
+    });
 
-// Connecté avec succés
-mongoose.connection.on('connected', () => {
-    console.log('Connected to database ' + config.database);
-});
-
-// Erreur de connexion
-mongoose.connection.on('error', (err) => {
-    console.log('Database error: ' + err);
-});
 
 // Utilisation de Express js
 const app = express();
 
 // users routing
-const users = require('./routes/users');
+const usersRoutes = require('./routes/users');
+const servicesRoutes = require('./routes/service');
 
 // port 3000
 const port = 3000;
@@ -51,7 +54,9 @@ app.use(passport.session());
 
 require('./config/passport')(passport);
 
-app.use('/users', users);
+//Road set
+app.use('/users', usersRoutes);
+app.use('/services', servicesRoutes);
 
 // index route
 app.get('/', (req, res) => {
