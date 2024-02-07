@@ -35,9 +35,20 @@ const EmployeeShema = mongoose.Schema({
 
 const Employee = module.exports = mongoose.model('Employee',EmployeeShema);
 
+// All employee
 module.exports.getAllEmployee = async function(){
     try{
         return await Employee.find();
+    }catch(error){
+        throw error;
+    }
+};
+
+// Find per email
+module.exports.getEmployeeByEmail = async function(email){
+    try{
+        const query = {email: email};
+        return await Employee.findOne(query);
     }catch(error){
         throw error;
     }
@@ -68,6 +79,7 @@ module.exports.createEmployee = async function(newEmployee){
     }
 };
 
+// Update 
 module.exports.updateEmployee = async function(employeeId,updatedEmployee){
     try {
         const employee = await this.find(employeeId);
@@ -84,26 +96,23 @@ module.exports.updateEmployee = async function(employeeId,updatedEmployee){
     }
 };
 
+// Create Tasks
 module.exports.createTasksCompleted = async function(employeeId,newTasksCompleted){
     try {
         const employee = await this.findById(employeeId);
         if (!employee) {
             throw new Error("Employee not found");
         }
-
         // Assurer que tasksCompleted est un tableau
         if (!Array.isArray(employee.tasksCompleted)) {
             employee.tasksCompleted = [];
         }
-
         // Vérifier si une tâche avec la même date existe déjà
         const duplicateTask = employee.tasksCompleted.find(task => task.date.getTime() === newTasksCompleted.date.getTime());
         if (duplicateTask) {
             throw new Error("A task with the same date already exists");
         }
-
         employee.tasksCompleted.push(newTasksCompleted);
-
         // Sauvegarder l'employé avec les nouvelles tâches complétées
         return await employee.save();
     } catch (error) {

@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Employee = require('../models/employee');
 
+//Register
 router.post('/register', async (req, res, next) => {
     try {
         const checkEmployee = await Employee.findOne({ email: req.body.email });
@@ -26,6 +27,42 @@ router.post('/register', async (req, res, next) => {
     }
 });
 
+//Login
+router.post('/authenticate',async (req,res,next)=>{
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
+
+        const employee = await Employee.getEmployeeByEmail(email);
+
+        if(!employee){
+            return res.json({ success: false, msg: 'User not found' });
+        }
+
+        const isMatch = await Employee.comparePassword(password, employee.password);
+        if(isMatch){
+            const token = jwt.sign(
+                {
+                    email: employee.email,
+                    employeeId: employee._id.toString()
+                },
+                "clef_privee",
+                {
+                expiresIn: 604800 // 1 semaine
+            });
+            res.json({
+                success: true,
+                message:"Connexion effectuer",
+                token: token,
+                employee: employee
+            });
+        }else{
+            return res.json({ success: false, msg: 'Wrong password' });
+        }
+    } catch (error) {
+        
+    }
+});
 
 
 // Route for creating new completed tasks
@@ -48,6 +85,12 @@ router.post('/tasksCompleted/:employeeId', async (req, res) => {
         console.error('Error creating tasks completed:', error.message);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+const checkIsConnected = require('./../middlewares/employeeConnected');
+
+router.get('/all',checkIsConnected,async(req,res,next)=>{
+    res.json({message:"Liste des employees"});
 });
 
 module.exports = router;
