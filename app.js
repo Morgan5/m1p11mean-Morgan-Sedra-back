@@ -28,6 +28,7 @@ const app = express();
 // users routing
 const usersRoutes = require('./routes/users');
 const servicesRoutes = require('./routes/service');
+const employeeRoutes = require('./routes/employee');
 
 // port 3000
 const port = 3000;
@@ -57,6 +58,7 @@ require('./config/passport')(passport);
 //Road set
 app.use('/users', usersRoutes);
 app.use('/services', servicesRoutes);
+app.use('/employees', employeeRoutes);
 
 // index route
 app.get('/', (req, res) => {
