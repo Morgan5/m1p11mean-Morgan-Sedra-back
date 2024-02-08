@@ -3,6 +3,11 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
+//const Passport = require('passport').Passport;
+//const userPassport = new Passport();
+//const clientPassport = new Passport();
+//const userPassport = require('passport');
+//const clientPassport = require('passport');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const config = require('./config/database');
@@ -25,9 +30,10 @@ mongoose
 // Utilisation de Express js
 const app = express();
 
-// users routing
+// routing
 const usersRoutes = require('./routes/users');
 const servicesRoutes = require('./routes/service');
+const clientsRoutes = require('./routes/clients');
 
 // port 3000
 const port = 3000;
@@ -54,9 +60,18 @@ app.use(passport.session());
 
 require('./config/passport')(passport);
 
+/*app.use(userPassport.initialize({ userProperty: "user" }));
+app.use(userPassport.session()); // persistent login sessions
+app.use(clientPassport.initialize({ userProperty: "client" }));
+app.use(clientPassport.session()); // persistent login sessions
+
+require('./config/passport')(userPassport);
+require('./config/passport-client')(clientPassport);*/
+
 //Road set
 app.use('/users', usersRoutes);
 app.use('/services', servicesRoutes);
+app.use('/clients', clientsRoutes);
 
 // index route
 app.get('/', (req, res) => {

@@ -3,61 +3,62 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
-const User = require('../models/user');
+const Client = require('../models/client');
+
 // Inscription
 router.post('/register', async (req, res, next) => {
     try {
-        const checkUser = await User.findOne({email:req.body.email});
-        if(checkUser){
+        const checkClient = await Client.findOne({email:req.body.email});
+        if(checkClient){
             res.status(401).json({ success: false, msg: 'Email already in use' });
         }
         else{
-            const newUser = new User({
-                name: req.body.name,
+            const newClient = new Client({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
                 email: req.body.email,
-                username: req.body.username,
                 password: req.body.password,
-                contact: req.body.contact,
-                role: 'Manager'
+                contact: req.body.contact
+                // mbola apina le attribut ambony
             });
-            const savedUser = await User.addUser(newUser);
-            res.json({ success: true, msg: 'User registered', user: savedUser });
+            const savedClient = await Client.addClient(newClient);
+            res.json({ success: true, msg: 'Client registered', client: savedClient });
         }
     } catch (err) {
         console.error(err);
-        res.json({ success: false, msg: 'Failed to register user' });
+        res.json({ success: false, msg: 'Failed to register client' });
     }
 });
 
 // Connexion
 router.post('/authenticate', async (req, res, next) => {
     try {
-        const username = req.body.username;
+        const email = req.body.email;
         const password = req.body.password;
 
-        const user = await User.getUserByUsername(username);
+        const client = await Client.getClientByEmail(email);
 
-        if (!user) {
-            return res.json({ success: false, msg: 'User not found' });
+        if (!client) {
+            return res.json({ success: false, msg: 'Client not found' });
         }
 
-        const isMatch = await User.comparePassword(password, user.password);
+        const isMatch = await Client.comparePassword(password, client.password);
 
         if (isMatch) {
-            const token = jwt.sign(user.toJSON(), config.secret, {
+            const token = jwt.sign(client.toJSON(), config.secret, {
                 expiresIn: 604800 // 1 semaine
             });
 
             res.json({
                 success: true,
                 token: 'Bearer ' + token,
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    username: user.username,
-                    email: user.email,
-                    contact: user.contact,
-                    role: user.role
+                client: {
+                    id: client._id,
+                    firstName: client.firstName,
+                    lastName: client.lastName,
+                    email: client.email,
+                    contact: client.contact
+                    // mbola apina le attribut ambony
                 }
             });
         } else {
@@ -70,17 +71,17 @@ router.post('/authenticate', async (req, res, next) => {
 });
 
 // Profile 
-router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res, next) => {
-    res.json({user: req.user});
-});
+/*router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res, next) => {
+    res.json({client: req.user});
+});*/
 
-//All users
+//All clients
 router.get('/all', passport.authenticate('jwt', {session:false}),async (req, res, next) =>{
     try {
-        const userList = await User.getAllUsers();
+        const clientList = await Client.getAllClients();
         res.json({
             success:true,
-            data:userList
+            data:clientList
         });
     } catch (error) {
         res.status(500).json({

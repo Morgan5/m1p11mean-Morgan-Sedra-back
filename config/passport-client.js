@@ -1,6 +1,7 @@
 const JwtStrategy = require('passport-jwt').Strategy;
+const BearerStrategy = require('passport-http-bearer');
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/user');
+const Client = require('../models/client');
 const config = require('../config/database');
 
 module.exports = function(passport) {
@@ -10,14 +11,14 @@ module.exports = function(passport) {
 
     passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
         try {
-            const user = await User.getUserById(jwt_payload._id);
-            if(user){
-                return done(null, user);
+            const client = await Client.getClientById(jwt_payload._id);
+            if(client){
+                return done(null, client);
             } else {
                 return done(null, false);
             }
         } catch (err) {
             return done(err, false);
         }
-    }))
+    }));
 };
