@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const config = require('../config/database');
 
 module.exports = (req, res, next) => {
     const authorizationHeader = req.get("Authorization");
@@ -7,7 +8,7 @@ module.exports = (req, res, next) => {
     }
     const token = authorizationHeader.split("Bearer ")[1];
     try {
-        const decodedToken = jwt.verify(token, "clef_privee");
+        const decodedToken = jwt.verify(token, config.secret);
         if (!decodedToken) {
             return res.status(401).json({ error: "Login failed" });
         }

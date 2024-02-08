@@ -46,14 +46,14 @@ router.post('/authenticate',async (req,res,next)=>{
                     email: employee.email,
                     employeeId: employee._id.toString()
                 },
-                "clef_privee",
+                config.secret,
                 {
                 expiresIn: 604800 // 1 semaine
             });
             res.json({
                 success: true,
                 message:"Connexion effectuer",
-                token: token,
+                token: 'Bearer ' + token,
                 employee: employee
             });
         }else{
