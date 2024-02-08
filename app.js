@@ -33,6 +33,7 @@ const app = express();
 // routing
 const usersRoutes = require('./routes/users');
 const servicesRoutes = require('./routes/service');
+const employeeRoutes = require('./routes/employee');
 const clientsRoutes = require('./routes/clients');
 
 // port 3000
@@ -71,6 +72,7 @@ require('./config/passport-client')(clientPassport);*/
 //Road set
 app.use('/users', usersRoutes);
 app.use('/services', servicesRoutes);
+app.use('/employees', employeeRoutes);
 app.use('/clients', clientsRoutes);
 
 // index route

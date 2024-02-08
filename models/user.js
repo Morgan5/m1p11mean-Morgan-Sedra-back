@@ -54,7 +54,7 @@ module.exports.getUserByUsername = async function(username) {
     } catch (error) {
         throw error;
     }
-}
+};
 
 // Inscription
 module.exports.addUser = async function(newUser){
