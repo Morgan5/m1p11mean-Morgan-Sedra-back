@@ -43,6 +43,16 @@ module.exports.createService = async function(newService){
     }
 }
 
+// Delete Service 
+module.exports.deleteService = async function(serviceId){
+    try {
+        return await Service.findByIdAndDelete(serviceId);
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Update
 module.exports.updateService = async function(serviceId,updatedService){
     try {
         const service = await this.findById(serviceId);

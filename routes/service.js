@@ -37,6 +37,26 @@ router.post('/create', async (req, res, next) => {
     }
 });
 
+// Delete Service 
+router.delete('/:serviceId', async (req, res) => {
+    try {
+        const serviceId = req.params.serviceId;
+        const deletedService = await serviceController.deleteService(serviceId);
+
+        if (deletedService === null) {
+            res.status(404).json({ message: 'Service not found' });
+        } else {
+            res.status(200).json({
+                message: 'Service deleted successfully',
+                data: deletedService
+            });
+        }
+    } catch (error) {
+        console.error('Erreur lors de la suppression du service :', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 //Update service
 router.put('/update/:serviceId', async (req, res, next) => {
     try {

@@ -69,20 +69,35 @@ router.post('/tasksCompleted/:employeeId', async (req, res) => {
     try {
         const employeeId = req.params.employeeId;
 
-        // Assurez-vous de convertir la chaîne de date en objet Date
         const newTasksCompleted = {
             date: new Date(req.body.date), // Convertir la chaîne de date en objet Date
             commissionAmount: req.body.commissionAmount,
         };
 
-        // Appeler la fonction createTasksCompleted du modèle pour ajouter les tâches complétées
         const updatedEmployee = await Employee.createTasksCompleted(employeeId, newTasksCompleted);
 
-        // Renvoyer la réponse JSON avec l'employé mis à jour
         res.status(201).json(updatedEmployee);
     } catch (error) {
         console.error('Error creating tasks completed:', error.message);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Route pour créer de nouveaux services demandés pour un rendez-vous
+router.post('/requestedServices/:appointmentId', async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+        const requestedServicesData = req.body.requestedServices;
+
+        const updatedAppointment = await appointmentController.createRequestedServices(appointmentId, requestedServicesData);
+
+        res.status(200).json({
+            message: 'New requested services added successfully',
+            data: updatedAppointment
+        });
+    } catch (error) {
+        console.error('Error creating new requested services:', error.message);
+        res.status(500).json({ error: 'Erreur interne du serveur' });
     }
 });
 
