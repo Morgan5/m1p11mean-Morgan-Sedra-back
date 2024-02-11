@@ -63,6 +63,22 @@ router.post('/authenticate',async (req,res,next)=>{
     }
 });
 
+// Route pour la mise à jour d'un employé
+router.put('/update/:employeeId', async (req, res) => {
+    const employeeId = req.params.employeeId;
+    const updatedEmployee = req.body; // Assurez-vous que les données du formulaire sont envoyées dans le corps de la requête
+    try {
+        const result = await Employee.updateEmployee(employeeId, updatedEmployee);
+        res.status(200).json({
+            message: 'Employee updated successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Error updating employee:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 // Route for creating new completed tasks
 router.post('/tasksCompleted/:employeeId', async (req, res) => {

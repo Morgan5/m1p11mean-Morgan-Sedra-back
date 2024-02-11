@@ -35,6 +35,28 @@ const EmployeeShema = mongoose.Schema({
 
 const Employee = module.exports = mongoose.model('Employee',EmployeeShema);
 
+
+// Update 
+module.exports.updateEmployee = async function(employeeId,updatedEmployee){
+    try {
+        const result = await Employee.findByIdAndUpdate(
+            employeeId,
+            {
+                $set: updatedEmployee
+            },
+            { new: true } // Pour retourner le document mis à jour
+        );
+
+        if (!result) {
+            throw new Error("Employee not found");
+        }
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // All employee
 module.exports.getAllEmployee = async function(){
     try{
@@ -88,22 +110,6 @@ module.exports.createEmployee = async function(newEmployee){
     }
 };  
 
-// Update 
-module.exports.updateEmployee = async function(employeeId,updatedEmployee){
-    try {
-        const employee = await this.find(employeeId);
-        if(!employee){
-            throw new Error("Employee not found");
-        }
-        employee.firstName = updatedEmployee.firstName || employee.firstName;
-        employee.lastName = updatedEmployee.lastName || employee.lastName;
-        employee.email = updatedEmployee.email || employee.email;
-        employee.password = employee.password;
-        return await employee.save();
-    } catch (error) {
-        throw error;
-    }
-};
 
 // Create Tasks
 module.exports.createTasksCompleted = async function(employeeId,newTasksCompleted){
