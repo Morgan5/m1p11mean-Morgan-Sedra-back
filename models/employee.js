@@ -44,6 +44,15 @@ module.exports.getAllEmployee = async function(){
     }
 };
 
+// Delete Employee
+module.exports.deleteEmployee = async function(employeeId){
+    try {
+        return await Employee.findByIdAndDelete(employeeId);
+    } catch (error) {
+        throw error;
+    }
+}
+
 // Find per email
 module.exports.getEmployeeByEmail = async function(email){
     try{
@@ -77,7 +86,7 @@ module.exports.createEmployee = async function(newEmployee){
     } catch (error) {
         throw error;
     }
-};
+};  
 
 // Update 
 module.exports.updateEmployee = async function(employeeId,updatedEmployee){

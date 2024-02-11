@@ -5,7 +5,7 @@ const config = require('../config/database');
 const Employee = require('../models/employee');
 
 //Register
-router.post('/register', async (req, res, next) => {
+router.post('/create', async (req, res, next) => {
     try {
         const checkEmployee = await Employee.findOne({ email: req.body.email });
         if (checkEmployee) {
@@ -83,27 +83,39 @@ router.post('/tasksCompleted/:employeeId', async (req, res) => {
     }
 });
 
-// Route pour créer de nouveaux services demandés pour un rendez-vous
-router.post('/requestedServices/:appointmentId', async (req, res) => {
+// Route supprimer un employee
+router.delete('/delete/:employeeId',async (req,res)=>{
     try {
-        const appointmentId = req.params.appointmentId;
-        const requestedServicesData = req.body.requestedServices;
-
-        const updatedAppointment = await appointmentController.createRequestedServices(appointmentId, requestedServicesData);
-
-        res.status(200).json({
-            message: 'New requested services added successfully',
-            data: updatedAppointment
-        });
+        const employee = await Employee.deleteEmployee(req.params.employeeId);
+        if(!employee){
+            res.status(404).json({ message: 'Employee not found' });
+        }
+        else{
+            res.status(200).json({
+                message: 'Employee deleted successfully',
+                data: employee
+            });
+        }
     } catch (error) {
-        console.error('Error creating new requested services:', error.message);
-        res.status(500).json({ error: 'Erreur interne du serveur' });
+        console.error('Error deleting employee:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Route de tous les employees 
+router.get('/all',async(req,res,next)=>{
+    try {
+        const allEmployee = await Employee.getAllEmployee();
+        res.status(201).json(allEmployee); 
+    } catch (error) {
+        console.error('Error getting employee:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
 const checkIsConnected = require('./../middlewares/employeeConnected');
 
-router.get('/all',checkIsConnected,async(req,res,next)=>{
+router.get('/testToken',checkIsConnected,async(req,res,next)=>{
     res.json({message:"Liste des employees"});
 });
 

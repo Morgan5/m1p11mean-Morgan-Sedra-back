@@ -38,10 +38,10 @@ router.post('/create', async (req, res, next) => {
 });
 
 // Delete Service 
-router.delete('/:serviceId', async (req, res) => {
+router.delete('/delete/:serviceId', async (req, res) => {
     try {
         const serviceId = req.params.serviceId;
-        const deletedService = await serviceController.deleteService(serviceId);
+        const deletedService = await Service.deleteService(serviceId);
 
         if (deletedService === null) {
             res.status(404).json({ message: 'Service not found' });

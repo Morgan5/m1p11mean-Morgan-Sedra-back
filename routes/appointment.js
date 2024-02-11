@@ -76,6 +76,24 @@ router.get('/all',async (req,res)=>{
     }
 });
 
+// Route pour créer de nouveaux services demandés pour un rendez-vous
+router.post('/requestedServices/:appointmentId', async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+        const requestedServicesData = req.body.requestedServices;
+
+        const updatedAppointment = await appointmentController.createRequestedServices(appointmentId, requestedServicesData);
+
+        res.status(200).json({
+            message: 'New requested services added successfully',
+            data: updatedAppointment
+        });
+    } catch (error) {
+        console.error('Error creating new requested services:', error.message);
+        res.status(500).json({ error: 'Erreur interne du serveur' });
+    }
+});
+
 router.get('/test',async (req,res)=>{
     res.json({
         message: "Test fotsiny!"
