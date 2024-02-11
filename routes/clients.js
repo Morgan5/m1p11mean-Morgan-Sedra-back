@@ -18,7 +18,8 @@ router.post('/register', async (req, res, next) => {
                 lastName: req.body.lastName,
                 email: req.body.email,
                 password: req.body.password,
-                contact: req.body.contact
+                contact: req.body.contact,
+                role: 'Client',
                 // mbola apina le attribut ambony
             });
             const savedClient = await Client.addClient(newClient);
