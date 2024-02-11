@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Employee = require('../models/employee');
+const Service = require('../models/service');
 
 //Register
 router.post('/create', async (req, res, next) => {
@@ -63,6 +64,7 @@ router.post('/authenticate',async (req,res,next)=>{
     }
 });
 
+
 // Route pour la mise à jour d'un employé
 router.put('/update/:employeeId', async (req, res) => {
     const employeeId = req.params.employeeId;
@@ -86,8 +88,9 @@ router.post('/tasksCompleted/:employeeId', async (req, res) => {
         const employeeId = req.params.employeeId;
 
         const newTasksCompleted = {
-            date: new Date(req.body.date), // Convertir la chaîne de date en objet Date
+            date: new Date(req.body.date), 
             commissionAmount: req.body.commissionAmount,
+            serviceId:req.body.serviceId
         };
 
         const updatedEmployee = await Employee.createTasksCompleted(employeeId, newTasksCompleted);
@@ -119,7 +122,7 @@ router.delete('/delete/:employeeId',async (req,res)=>{
 });
 
 // Route de tous les employees 
-router.get('/all',async(req,res,next)=>{
+router.get('/all',async(req,res)=>{
     try {
         const allEmployee = await Employee.getAllEmployee();
         res.status(201).json(allEmployee); 
@@ -128,6 +131,22 @@ router.get('/all',async(req,res,next)=>{
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Route liste des employees avec jointure 
+router.get('/services', async (req, res) => {
+    try {
+    //   const employees = await Employee.getAllEmployeeWithServices();
+    const employees = await Employee.find().populate('tasksCompleted.service');
+      res.status(200).json({
+        message: 'Employees retrieved successfully',
+        data: employees,
+      });
+    } catch (error) {
+      console.error('Error retrieving employees:', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+  
 
 const checkIsConnected = require('./../middlewares/employeeConnected');
 

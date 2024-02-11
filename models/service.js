@@ -26,6 +26,9 @@ const ServiceShema = mongoose.Schema({
 
 const Service = module.exports = mongoose.model('Service',ServiceShema);
 
+module.exports = Service;
+
+// All service
 module.exports.getAllServices = async function(){
     try {
         return await Service.find();
@@ -34,6 +37,7 @@ module.exports.getAllServices = async function(){
     }
 }
 
+// Create service 
 module.exports.createService = async function(newService){
     try {
         const saveService = await newService.save();

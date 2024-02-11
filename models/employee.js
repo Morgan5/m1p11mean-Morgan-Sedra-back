@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Service = require('./service');
 
-//Employee Shema
-const EmployeeShema = mongoose.Schema({
+const employeeSchema = mongoose.Schema({
     firstName: {
         type: String,
         required: true,
@@ -29,13 +29,28 @@ const EmployeeShema = mongoose.Schema({
                 type: Number,
                 required: true,
             },
+            serviceId: {
+                type: mongoose.Schema.Types.ObjectId,
+                required: true,
+                ref: 'Service', // Référence correcte ici
+            }
         }
     ]
-},{timestamps: true});
+}, { timestamps: true });
 
-const Employee = module.exports = mongoose.model('Employee',EmployeeShema);
+const Employee = mongoose.model('Employee', employeeSchema);
 
+module.exports = Employee;
 
+//All employee join
+module.exports.getAllEmployeeWithServices = async function () {
+    try {
+      return await Employee.find().populate('tasksCompleted.service');
+    } catch (error) {
+      throw error;
+    }
+};
+  
 // Update 
 module.exports.updateEmployee = async function(employeeId,updatedEmployee){
     try {
@@ -66,6 +81,7 @@ module.exports.getAllEmployee = async function(){
     }
 };
 
+
 // Delete Employee
 module.exports.deleteEmployee = async function(employeeId){
     try {
@@ -73,7 +89,7 @@ module.exports.deleteEmployee = async function(employeeId){
     } catch (error) {
         throw error;
     }
-}
+};
 
 // Find per email
 module.exports.getEmployeeByEmail = async function(email){
@@ -118,8 +134,7 @@ module.exports.createTasksCompleted = async function(employeeId,newTasksComplete
         if (!employee) {
             throw new Error("Employee not found");
         }
-        // Assurer que tasksCompleted est un tableau
-        if (!Array.isArray(employee.tasksCompleted)) {
+        if (!Array.isArray(employee.tasksCompleted)) { // Assurer que tasksCompleted est un tableau
             employee.tasksCompleted = [];
         }
         // Vérifier si une tâche avec la même date existe déjà
@@ -128,7 +143,6 @@ module.exports.createTasksCompleted = async function(employeeId,newTasksComplete
             throw new Error("A task with the same date already exists");
         }
         employee.tasksCompleted.push(newTasksCompleted);
-        // Sauvegarder l'employé avec les nouvelles tâches complétées
         return await employee.save();
     } catch (error) {
         throw error;
