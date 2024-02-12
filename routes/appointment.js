@@ -45,10 +45,10 @@ router.put('/update/:appointmentId', async (req, res) => {
   });
 
 // Route pour supprimer un rendez-vous
-router.delete('/:appointmentId', async (req, res) => {
+router.delete('delete/:appointmentId', async (req, res) => {
     try {
         const appointmentId = req.params.appointmentId;
-        const deletedAppointment = await appointmentController.deleteAppointment(appointmentId);
+        const deletedAppointment = await Appointment.deleteAppointment(appointmentId);
 
         if (deletedAppointment === null) {
             res.status(404).json({ message: 'Appointment not found' });
@@ -82,7 +82,7 @@ router.post('/requestedServices/:appointmentId', async (req, res) => {
         const appointmentId = req.params.appointmentId;
         const requestedServicesData = req.body.requestedServices;
 
-        const updatedAppointment = await appointmentController.createRequestedServices(appointmentId, requestedServicesData);
+        const updatedAppointment = await Appointment.createRequestedServices(appointmentId, requestedServicesData);
 
         res.status(200).json({
             message: 'New requested services added successfully',
@@ -90,7 +90,16 @@ router.post('/requestedServices/:appointmentId', async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating new requested services:', error.message);
-        res.status(500).json({ error: 'Erreur interne du serveur' });
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.get('/full',async (req,res)=>{
+    try {
+        const client = await Appointment.getFullAppointment();
+        res.status(201).json(client);    
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 

@@ -33,6 +33,24 @@ const appointmentSchema = new mongoose.Schema({
 
 const Appointment = module.exports = mongoose.model('Appointment', appointmentSchema);
 
+// Join with populated
+module.exports.getFullAppointment = async function(){
+    try {
+        const populatedAppointment = await Appointment.find()
+                                    .populate('clientId')
+                                    .populate({
+                                        path: 'requestedServices',
+                                        populate: [
+                                        { path: 'serviceId', model: 'Service' },
+                                        { path: 'selectedEmployee', model: 'Employee' }
+                                        ]
+                                    });
+        return populatedAppointment;
+    } catch (error) {
+        throw error
+    }
+}
+
 // Create 
 module.exports.createAppointment = async function(appointmentData){
     try {
