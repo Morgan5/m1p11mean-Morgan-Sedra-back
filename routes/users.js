@@ -32,33 +32,28 @@ router.post('/register', async (req, res, next) => {
 // Connexion
 router.post('/authenticate', async (req, res, next) => {
     try {
-        const username = req.body.username;
+        const email = req.body.email;
         const password = req.body.password;
 
-        const user = await User.getUserByUsername(username);
+        const user = await User.getUserByEmail(email);
 
         if (!user) {
-            return res.json({ success: false, msg: 'User not found' });
+            return res.json({ message: 'User not found' });
         }
 
         const isMatch = await User.comparePassword(password, user.password);
 
         if (isMatch) {
-            const token = jwt.sign(user.toJSON(), config.secret, {
-                expiresIn: 60 // 1 semaine 604800
+            const token = jwt.sign(
+                user.toJSON(),
+                "secret_user",{
+                expiresIn: 604800 // 1 semaine
             });
-
             res.json({
                 success: true,
+                message:"Connexion effectuer",
                 token: 'Bearer ' + token,
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    username: user.username,
-                    email: user.email,
-                    contact: user.contact,
-                    role: user.role
-                }
+                user: user
             });
         } else {
             return res.json({ success: false, msg: 'Wrong password' });
@@ -74,8 +69,9 @@ router.get('/profile', passport.authenticate('jwt', {session:false}), (req, res,
     res.json({user: req.user});
 });
 
+const checkIsConnected = require('./../middlewares/userConnected');
 //All users
-router.get('/all', passport.authenticate('jwt', {session:false}),async (req, res, next) =>{
+router.get('/all', checkIsConnected,async (req, res, next) =>{
     try {
         const userList = await User.getAllUsers();
         res.json({

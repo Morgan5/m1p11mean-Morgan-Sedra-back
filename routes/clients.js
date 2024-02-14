@@ -92,5 +92,19 @@ router.get('/all', passport.authenticate('jwt', {session:false}),async (req, res
     }
 }); 
 
+const checkIsConnected = require('./../middlewares/userConnected');
+
+router.get('/manager/all',async (req, res, next) =>{
+    try {
+        const clientList = await Client.getAllClients();
+        res.json(clientList);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+          });
+    }
+}); 
+
 
 module.exports = router;

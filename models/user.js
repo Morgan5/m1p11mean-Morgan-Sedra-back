@@ -47,10 +47,10 @@ module.exports.getUserById = async function(id) {
     }
 };
 
-module.exports.getUserByUsername = async function(username) {
+module.exports.getUserByEmail = async function(email) {
     try {
-        const query = { username: username };
-        return await User.findOne(query).exec();
+        const query = { email: email };
+        return await User.findOne(query);
     } catch (error) {
         throw error;
     }
@@ -81,3 +81,6 @@ module.exports.comparePassword = async function(candidatePassword, hash) {
     }
 };
 
+// Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWMyMzI3YzQ1MjIwODJlYTM4NmZlN2MiLCJuYW1lIjoiU2VkcmEiLCJlbWFpbCI6InNlZHJhQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoic2VkcmEiLCJwYXNzd29yZCI6IiQyYSQxMCRrLmtyZkczcmlyVG1FamhMUk1HZldlenEuVzdxRkVVdkFiR3RYSHNiTVhubTI0NzdSUzl4MiIsImNvbnRhY3QiOiIwMzQxMTIyMjMzIiwicm9sZSI6Ik1hbmFnZXIiLCJjcmVhdGVkQXQiOiIyMDI0LTAyLTA2VDEzOjIyOjA0Ljg4N1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTAyLTA2VDEzOjIyOjA0Ljg4N1oiLCJfX3YiOjAsImlhdCI6MTcwNzg5NDY2MywiZXhwIjoxNzA3ODk0NzIzfQ.PJa1DGQheT1yM5jZonnWR7sur6SBUgMdwDW2aFUXBCs
+
+// Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNlZHJhQGdtYWlsLmNvbSIsInVzZXJJZCI6IjY1YzIzMjdjNDUyMjA4MmVhMzg2ZmU3YyIsImlhdCI6MTcwNzkwMDM0MSwiZXhwIjoxNzA4NTA1MTQxfQ.zul9fjGz533jB4Sct2gNhQmPIpN4Lzr1iHUifUQzWxk

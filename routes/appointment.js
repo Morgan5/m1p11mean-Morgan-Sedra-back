@@ -45,7 +45,7 @@ router.put('/update/:appointmentId', async (req, res) => {
   });
 
 // Route pour supprimer un rendez-vous
-router.delete('delete/:appointmentId', async (req, res) => {
+router.delete('/delete/:appointmentId', async (req, res) => {
     try {
         const appointmentId = req.params.appointmentId;
         const deletedAppointment = await Appointment.deleteAppointment(appointmentId);
