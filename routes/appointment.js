@@ -30,7 +30,7 @@ router.put('/update/:appointmentId', async (req, res) => {
       const updatedAppointment = await Appointment.findByIdAndUpdate(
         appointmentId,
         updatedData,
-        { new: true } // Pour renvoyer le document mis à jour
+        { new: true } 
       );
   
       if (!updatedAppointment) {
@@ -77,13 +77,17 @@ router.get('/all',async (req,res)=>{
 });
 
 // Route pour créer de nouveaux services demandés pour un rendez-vous
-router.post('/requestedServices/:appointmentId', async (req, res) => {
+router.post('/requestedService/:appointmentId', async (req, res) => {
     try {
         const appointmentId = req.params.appointmentId;
+        const appointment = await Appointment.findById(appointmentId);
+        if(!appointment){
+            res.json('Appointment not found');
+        }
         const requestedServicesData = req.body.requestedServices;
 
         const updatedAppointment = await Appointment.createRequestedServices(appointmentId, requestedServicesData);
-
+    
         res.status(200).json({
             message: 'New requested services added successfully',
             data: updatedAppointment
@@ -94,6 +98,18 @@ router.post('/requestedServices/:appointmentId', async (req, res) => {
     }
 });
 
+// Route pour getAppointmentId
+router.get('/appointment/:appointmentId', async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+        const appointments = await Appointment.getAppointmentId(appointmentId);
+        res.json( appointments );
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Route pour le jointure 
 router.get('/full',async (req,res)=>{
     try {
         const client = await Appointment.getFullAppointment();

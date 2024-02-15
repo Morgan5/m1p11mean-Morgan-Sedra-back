@@ -49,8 +49,26 @@ module.exports.getFullAppointment = async function(){
     } catch (error) {
         throw error
     }
-}
+};
 
+// Find Service Appointments by AppointmentId
+module.exports.getAppointmentId = async function(appointmentId){
+    try {
+        const populatedAppointments = await Appointment.find({ _id: appointmentId })
+            .populate('clientId')
+            .populate({
+                path: 'requestedServices',
+                populate: [
+                    { path: 'serviceId', model: 'Service' },
+                    { path: 'selectedEmployee', model: 'Employee' }
+                ]
+            });
+
+        return populatedAppointments;
+    } catch (error) {
+        throw error;
+    }
+};
 // Create 
 module.exports.createAppointment = async function(appointmentData){
     try {
@@ -72,18 +90,24 @@ module.exports.deleteAppointment = async function(appointmentId){
 };
 
 // Create new requestedServices
-module.exports.createRequestedServices = async function(appointmentId,requestedServicesData){
+module.exports.createRequestedServices = async function (appointmentId, requestedServicesData) {
     try {
         const appointment = await Appointment.findById(appointmentId);
-        if(!appointment){
+        if (!appointment) {
             throw new Error("Appointment not found");
         }
+
+        if (!Array.isArray(requestedServicesData)) {
+            throw new Error("Invalid requestedServicesData format");
+        }
+
         appointment.requestedServices.push(...requestedServicesData);
         const updatedAppointment = await appointment.save();
+        return updatedAppointment;
     } catch (error) {
         throw error;
     }
-};
+}
 
 // Update
 module.exports.updateAppointment = async function(appointmentId, updatedData){
