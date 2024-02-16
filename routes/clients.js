@@ -92,6 +92,46 @@ router.get('/all', passport.authenticate('jwt', {session:false}),async (req, res
     }
 }); 
 
+// Delete client
+router.delete('/delete/:clientId',async (req, res) =>{
+    try {
+        const clientId = req.params.clientId;
+        const deleteClient = await Client.deleteClient(clientId);
+        if(deleteClient == null){
+            res.status(404).json({ message: 'Client not found' });
+        }else{
+            res.status(200).json({
+                message: 'Client deleted successfully',
+                data: deleteClient
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+          });
+    }
+}); 
+
+// Route pour modificaiton de client 
+router.put('/update/:clientId', async (req, res) => {
+    try {
+        const clientId = req.params.clientId;
+        const updateClientData = req.body;
+
+        // Supposons que vous avez une fonction updateClient dans votre modèle ou votre contrôleur
+        const updatedClient = await Client.updateClient(clientId, updateClientData);
+
+        res.status(200).json({
+            message: 'Client updated successfully',
+            data: updatedClient
+        });
+    } catch (error) {
+        console.error('Error updating client:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 const checkIsConnected = require('./../middlewares/userConnected');
 
 router.get('/manager/all',async (req, res, next) =>{

@@ -91,6 +91,33 @@ module.exports.getClientByEmail = async function(email) {
     }
 }
 
+// Delete client
+module.exports.deleteClient = async function(clientId){
+    try {
+        return await Client.findByIdAndDelete(clientId);
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Update
+module.exports.updateClient = async function(clientId, updateClient) {
+    try {
+        const result = await Client.findByIdAndUpdate(
+            clientId,
+            updateClient,
+            { new: true }
+        );
+        if (!result) {
+            throw new Error("Client not found");
+        }
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 // Inscription
 module.exports.addClient = async function(newClient){
     try {
