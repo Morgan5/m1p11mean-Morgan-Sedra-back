@@ -63,7 +63,6 @@ module.exports.getAppointmentId = async function(appointmentId){
                     { path: 'selectedEmployee', model: 'Employee' }
                 ]
             });
-
         return populatedAppointments;
     } catch (error) {
         throw error;

@@ -133,17 +133,14 @@ router.get('/all',async(req,res)=>{
 });
 
 // Route liste des employees avec jointure 
-router.get('/services', async (req, res) => {
+router.get('/employee/:empId', async (req, res) => {
+    const empId = req.params.empId;
     try {
-    //   const employees = await Employee.getAllEmployeeWithServices();
-    const employees = await Employee.find().populate('tasksCompleted.service');
-      res.status(200).json({
-        message: 'Employees retrieved successfully',
-        data: employees,
-      });
+        const employeeData = await Employee.getAllEmployeeId(empId);
+        res.status(200).json(employeeData);
     } catch (error) {
-      console.error('Error retrieving employees:', error.message);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Erreur lors de la récupération des informations sur l\'employé :', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
   

@@ -43,9 +43,16 @@ const Employee = mongoose.model('Employee', employeeSchema);
 module.exports = Employee;
 
 //All employee join
-module.exports.getAllEmployeeWithServices = async function () {
+module.exports.getAllEmployeeId = async function (empId) {
     try {
-      return await Employee.find().populate('tasksCompleted.service');
+        const populateEmployee = await Employee.findOne({_id: empId}) 
+        .populate({
+            path: 'tasksCompleted',
+            populate: [
+                { path: 'serviceId', model: 'Service' }
+            ]
+        });
+      return populateEmployee;
     } catch (error) {
       throw error;
     }
