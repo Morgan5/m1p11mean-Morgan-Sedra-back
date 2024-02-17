@@ -51,6 +51,64 @@ module.exports.getFullAppointment = async function(){
     }
 };
 
+// Where status Confirmed
+module.exports.getFullAppointmentConfirmed = async function() {
+    try {
+        const populatedAppointments = await Appointment.find({ status: 'Confirmed' })
+            .populate('clientId')
+            .populate({
+                path: 'requestedServices',
+                populate: [
+                    { path: 'serviceId', model: 'Service' },
+                    { path: 'selectedEmployee', model: 'Employee' }
+                ]
+            });
+
+        return populatedAppointments;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Where status Cancelled
+module.exports.getFullAppointmentCancelled = async function() {
+    try {
+        const populatedAppointments = await Appointment.find({ status: 'Cancelled' })
+            .populate('clientId')
+            .populate({
+                path: 'requestedServices',
+                populate: [
+                    { path: 'serviceId', model: 'Service' },
+                    { path: 'selectedEmployee', model: 'Employee' }
+                ]
+            });
+
+        return populatedAppointments;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Where status Pending
+module.exports.getFullAppointmentPending = async function() {
+    try {
+        const populatedAppointments = await Appointment.find({ status: 'Pending' })
+            .populate('clientId')
+            .populate({
+                path: 'requestedServices',
+                populate: [
+                    { path: 'serviceId', model: 'Service' },
+                    { path: 'selectedEmployee', model: 'Employee' }
+                ]
+            });
+
+        return populatedAppointments;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 // Find Service Appointments by AppointmentId
 module.exports.getAppointmentId = async function(appointmentId){
     try {
@@ -133,6 +191,26 @@ module.exports.updateAppointment = async function(appointmentId, updatedData){
         throw error;
     }
 };
+
+// Update status
+module.exports.updateAppointmentStatus = async function(appointmentId, updatedData){
+    try {
+        // Utilisez la méthode findByIdAndUpdate de Mongoose pour mettre à jour le statut de l'appointment
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointmentId,
+            { $set: { status: updatedData.status } },
+            { new: true } // Pour retourner le document mis à jour
+        );
+
+        if (!updatedAppointment) {
+            throw new Error("Appointment not found");  // Gérez le cas où l'appointment n'est pas trouvé
+        }
+
+        return updatedAppointment;
+    } catch (error) {
+        throw error;
+    }
+}
 
 // All
 module.exports.getAppointment = async function(){

@@ -64,7 +64,6 @@ router.delete('/delete/:appointmentId', async (req, res) => {
     }
 });
   
-
 // Appointments
 router.get('/all',async (req,res)=>{
     try {
@@ -115,6 +114,54 @@ router.get('/full',async (req,res)=>{
         const client = await Appointment.getFullAppointment();
         res.status(201).json(client);    
     } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+//Route pour les appointment pending
+router.get('/pending', async (req, res) => {
+    try {
+        const fullAppointments = await Appointment.getFullAppointmentPending();
+        res.status(200).json(fullAppointments);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des rendez-vous complets :', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+//Route pour les appointment Cancelled
+router.get('/cancelled', async (req, res) => {
+    try {
+        const fullAppointments = await Appointment.getFullAppointmentCancelled();
+        res.status(200).json(fullAppointments);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des rendez-vous complets :', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+//Route pour les appointment Confirmed
+router.get('/confirmed', async (req, res) => {
+    try {
+        const fullAppointments = await Appointment.getFullAppointmentConfirmed();
+        res.status(200).json(fullAppointments);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des rendez-vous complets :', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Route pour mettre à jour le statut de l'appointment
+router.put('/updateStatus/:appointmentId', async (req, res) => {
+    const  appointmentId  = req.params.appointmentId;
+    const  status  = req.body;
+    console.log( appointmentId,status );
+    try {
+        const updatedAppointment = await Appointment.updateAppointmentStatus(appointmentId,  status );
+        res.status(200).json(updatedAppointment);
+    } catch (error) {
+        // Gérez les erreurs
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
