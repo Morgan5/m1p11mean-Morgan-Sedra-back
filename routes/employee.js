@@ -12,18 +12,23 @@ router.post('/create', async (req, res, next) => {
         if (checkEmployee) {
             return res.status(401).json({ success: false, msg: 'Email already in use' });
         }
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, contact } = req.body;
         const newEmployee = new Employee({
             firstName,
             lastName,
             email,
             password,
+            contact,
+            role: 'Employee'
         });
         const createdEmployee = await Employee.createEmployee(newEmployee);
-        res.status(201).json(createdEmployee);
+        res.json({ success: true, msg: 'Employee registered', employee: createdEmployee });
+        //res.status(201).json(createdEmployee);
     } catch (error) {
-        console.error('Error creating employee:', error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+        //console.error('Error creating employee:', error.message);
+        //res.status(500).json({ error: 'Internal Server Error' });
+        console.error(err);
+        res.json({ success: false, msg: 'Failed to register employee' });
     }
 });
 
@@ -36,16 +41,14 @@ router.post('/authenticate',async (req,res,next)=>{
         const employee = await Employee.getEmployeeByEmail(email);
 
         if(!employee){
-            return res.json({ success: false, msg: 'User not found' });
+            return res.json({ success: false, msg: 'Employee not found' });
         }
 
         const isMatch = await Employee.comparePassword(password, employee.password);
+
         if(isMatch){
             const token = jwt.sign(
-                {
-                    email: employee.email,
-                    employeeId: employee._id.toString()
-                },
+                employee.toJSON(),
                 config.secret,
                 {
                 expiresIn: 604800 // 1 semaine
@@ -60,7 +63,8 @@ router.post('/authenticate',async (req,res,next)=>{
             return res.json({ success: false, msg: 'Wrong password' });
         }
     } catch (error) {
-        
+        console.error(err);
+        res.json({ success: false, msg: 'Error during authentication' });
     }
 });
 

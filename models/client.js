@@ -2,30 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const config = require('../config/database');
 
-/* CLIENT
-{
-    "_id": ObjectId("client1"),
-    "firstName": "Alice",
-    "lastName": "Dupont",
-    "email": "alice.dupont@example.com",
-    "password": "hashedPassword",
-    "contact": "0341234567",
-    "appointmentHistory": [
-      {
-        "appointmentId": ObjectId("appointment1"),
-        "appointmentDate": ISODate("2024-02-06T10:00:00Z"),
-        "status": "Confirmed"
-      }
-    ],
-    "preferences": {
-      "preferredService": ObjectId("service1"),
-      "preferredEmployee": ObjectId("employee1")
-    },
-    "authorizedSpecialOffers": [
-      ObjectId("specialOffer1")
-    ]
-  }*/
-  
 // Client Schema
 const ClientSchema = mongoose.Schema({
     firstName: {
