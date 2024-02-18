@@ -31,12 +31,10 @@ const ClientSchema = mongoose.Schema({
     preferences: {
         serviceId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
             ref: 'Service'
         },
         employeeId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
             ref: 'Employee'
         }
     },
