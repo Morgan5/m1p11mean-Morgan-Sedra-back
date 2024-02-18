@@ -63,6 +63,28 @@ router.delete('/delete/:appointmentId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Route pour supprimer un service d'un rendez-vous
+router.delete('/requestedService/:appointmentId', async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+        const requestedServiceId = req.body.requestedServiceId;
+        
+        const deletedRequestedServiceAppointment = await Appointment.deleteRequestedServiceAppointment(appointmentId, requestedServiceId);
+
+        if (deletedRequestedServiceAppointment === null) {
+            res.status(404).json({ message: 'Appointment not found' });
+        } else {
+            res.status(200).json({
+                message: 'Requested service appointment deleted successfully',
+                data: deletedRequestedServiceAppointment
+            });
+        }
+    } catch (error) {
+        console.error('Erreur lors de la suppression du service du rendez-vous :', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
   
 // Appointments
 router.get('/all',async (req,res)=>{
@@ -96,6 +118,29 @@ router.post('/requestedService/:appointmentId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Route pour modifier des services demandés pour un rendez-vous
+router.put('/requestedService/:appointmentId', async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+        const appointment = await Appointment.findById(appointmentId);
+        if(!appointment){
+            res.json('Appointment not found');
+        }
+        const requestedServicesData = req.body.requestedServices;
+
+        const updatedAppointment = await Appointment.updateRequestedServiceAppointment(appointmentId, requestedServicesData);
+    
+        res.status(200).json({
+            message: 'Requested services updated successfully',
+            data: updatedAppointment
+        });
+    } catch (error) {
+        console.error('Error updating new requested services:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 // Route pour getAppointmentId
 router.get('/appointment/:appointmentId', async (req, res) => {
@@ -170,6 +215,17 @@ router.get('/test',async (req,res)=>{
     res.json({
         message: "Test fotsiny!"
     });
+});
+
+// Get appointment by client id
+router.get('/clientAppointments/:clientId',async (req,res)=>{
+    try {
+        const clientId = req.params.clientId;
+        const clientAppointments = await Appointment.getFullAppointmentByClientId(clientId);
+        res.status(201).json(clientAppointments);    
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 module.exports = router;

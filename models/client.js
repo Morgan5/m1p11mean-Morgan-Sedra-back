@@ -28,29 +28,69 @@ const ClientSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    appointmentHistory: {
-        type: String // mbola ovaina
-    },
     preferences: {
-        type: String // mbola ovaina
+        serviceId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'Service'
+        },
+        employeeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'Employee'
+        }
     },
     authorizedSpecialOffers: {
         type: String // mbola ovaina
     }
 
-}, {timestamps: true});
+}, { timestamps: true });
 
 const Client = module.exports = mongoose.model('Client', ClientSchema);
 
-module.exports.getAllClients = async function(){
-    try{
-        return await Client.find();
-    }catch (error) {
+module.exports.getAllClients = async function () {
+    try {
+        return await Client.find().populate('preferences.serviceId').populate('preferences.employeeId');
+    } catch (error) {
         throw error;
     }
 }
 
-module.exports.getClientById = async function(id) {
+module.exports.getAllClientsFull = async function(){
+    try {
+        return await Client.find()
+            .populate({
+                path: 'preferences.serviceId',
+                model: 'Service' // Nom du modèle de la collection Service
+            })
+            .populate({
+                path: 'preferences.employeeId',
+                model: 'Employee' // Nom du modèle de la collection Employee
+            });
+    } catch (error) {
+        throw error;
+    }
+}
+
+module.exports.getAllClientsFullById = async function(id){
+    try {
+        return await Client.findById(id)
+            .populate({
+                path: 'preferences.serviceId',
+                model: 'Service' // Nom du modèle de la collection Service
+            })
+            .populate({
+                path: 'preferences.employeeId',
+                model: 'Employee' // Nom du modèle de la collection Employee
+            });
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
+module.exports.getClientById = async function (id) {
     try {
         return await Client.findById(id);
     } catch (error) {
@@ -58,7 +98,7 @@ module.exports.getClientById = async function(id) {
     }
 };
 
-module.exports.getClientByEmail = async function(email) {
+module.exports.getClientByEmail = async function (email) {
     try {
         const query = { email: email };
         return await Client.findOne(query).exec();
@@ -68,7 +108,7 @@ module.exports.getClientByEmail = async function(email) {
 }
 
 // Delete client
-module.exports.deleteClient = async function(clientId){
+module.exports.deleteClient = async function (clientId) {
     try {
         return await Client.findByIdAndDelete(clientId);
     } catch (error) {
@@ -77,7 +117,7 @@ module.exports.deleteClient = async function(clientId){
 }
 
 // Update
-module.exports.updateClient = async function(clientId, updateClient) {
+module.exports.updateClient = async function (clientId, updateClient) {
     try {
         const result = await Client.findByIdAndUpdate(
             clientId,
@@ -95,7 +135,7 @@ module.exports.updateClient = async function(clientId, updateClient) {
 
 
 // Inscription
-module.exports.addClient = async function(newClient){
+module.exports.addClient = async function (newClient) {
     try {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(newClient.password, salt);
@@ -110,7 +150,7 @@ module.exports.addClient = async function(newClient){
 };
 
 // Connexion
-module.exports.comparePassword = async function(candidatePassword, hash) {
+module.exports.comparePassword = async function (candidatePassword, hash) {
     try {
         const isMatch = await bcrypt.compare(candidatePassword, hash);
         return isMatch;
@@ -119,3 +159,21 @@ module.exports.comparePassword = async function(candidatePassword, hash) {
     }
 };
 
+// ajout et modification préférence client
+module.exports.addPreferenceClient = async function (clientId, serviceId, employeeId) {
+    try {
+        let client = await Client.findById(clientId);
+        if (!client) {
+            throw new Error('Client not found');
+        }
+        client.preferences = {
+            serviceId: serviceId,
+            employeeId: employeeId
+        };
+        await client.save();
+
+        return client;
+    } catch (error) {
+        throw error;
+    }
+};

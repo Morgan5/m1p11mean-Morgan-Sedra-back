@@ -29,22 +29,22 @@ const appointmentSchema = new mongoose.Schema({
         enum: ['Confirmed', 'Pending', 'Cancelled'],
         default: 'Pending'
     }
-});
+}, { timestamps: true });
 
 const Appointment = module.exports = mongoose.model('Appointment', appointmentSchema);
 
 // Join with populated
-module.exports.getFullAppointment = async function(){
+module.exports.getFullAppointment = async function () {
     try {
         const populatedAppointment = await Appointment.find()
-                                    .populate('clientId')
-                                    .populate({
-                                        path: 'requestedServices',
-                                        populate: [
-                                        { path: 'serviceId', model: 'Service' },
-                                        { path: 'selectedEmployee', model: 'Employee' }
-                                        ]
-                                    });
+            .populate('clientId')
+            .populate({
+                path: 'requestedServices',
+                populate: [
+                    { path: 'serviceId', model: 'Service' },
+                    { path: 'selectedEmployee', model: 'Employee' }
+                ]
+            });
         return populatedAppointment;
     } catch (error) {
         throw error
@@ -110,7 +110,7 @@ module.exports.getFullAppointmentPending = async function() {
 
 
 // Find Service Appointments by AppointmentId
-module.exports.getAppointmentId = async function(appointmentId){
+module.exports.getAppointmentId = async function (appointmentId) {
     try {
         const populatedAppointments = await Appointment.find({ _id: appointmentId })
             .populate('clientId')
@@ -127,7 +127,7 @@ module.exports.getAppointmentId = async function(appointmentId){
     }
 };
 // Create 
-module.exports.createAppointment = async function(appointmentData){
+module.exports.createAppointment = async function (appointmentData) {
     try {
         const newAppointment = new Appointment(appointmentData);
         const savedAppointment = await newAppointment.save();
@@ -138,9 +138,34 @@ module.exports.createAppointment = async function(appointmentData){
 };
 
 // Detele
-module.exports.deleteAppointment = async function(appointmentId){
+module.exports.deleteAppointment = async function (appointmentId) {
     try {
         return await Appointment.findByIdAndDelete(appointmentId);
+    } catch (error) {
+        throw error;
+    }
+};
+
+// delete requestedServiceAppointment 
+module.exports.deleteRequestedServiceAppointment = async function (appointmentId, requestedServiceId) {
+    try {
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
+
+        // Vérifie si le service demandé existe dans l'appointment
+        const requestedServiceIndex = appointment.requestedServices.findIndex(service => service._id.toString() === requestedServiceId);
+        if (requestedServiceIndex === -1) {
+            throw new Error("Requested service not found in the appointment");
+        }
+
+        // Supprime le service demandé de l'array des requestedServices
+        appointment.requestedServices.splice(requestedServiceIndex, 1);
+
+        // Sauvegarde les modifications
+        return await appointment.save();
+
     } catch (error) {
         throw error;
     }
@@ -166,8 +191,38 @@ module.exports.createRequestedServices = async function (appointmentId, requeste
     }
 }
 
+// update requestedServicesAppointment
+module.exports.updateRequestedServiceAppointment = async function (appointmentId, updateRequestedServiceData) {
+    try {
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) {
+            throw new Error("Appointment not found");
+        }
+
+        if (!Array.isArray(updateRequestedServiceData)) {
+            throw new Error("Invalid updateRequestedServiceData format");
+        }
+
+        appointment.requestedServices = appointment.requestedServices.map(requestedService => {
+            const updateData = updateRequestedServiceData.find(data => data._id === requestedService._id.toString());
+            if (updateData) {
+                return {
+                    ...requestedService,
+                    ...updateData
+                };
+            }
+            return requestedService;
+        });
+
+        const updatedAppointment = await appointment.save();
+        return updatedAppointment;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // Update
-module.exports.updateAppointment = async function(appointmentId, updatedData){
+module.exports.updateAppointment = async function (appointmentId, updatedData) {
     try {
         const appointment = await Appointment.findById(appointmentId);
         if (!appointment) {
@@ -213,11 +268,29 @@ module.exports.updateAppointmentStatus = async function(appointmentId, updatedDa
 }
 
 // All
-module.exports.getAppointment = async function(){
+module.exports.getAppointment = async function () {
     try {
         return await Appointment.find();
     } catch (error) {
         throw error;
+    }
+};
+
+// Get appointment by client id
+module.exports.getFullAppointmentByClientId = async function (clientId) {
+    try {
+        const populatedAppointment = await Appointment.find({ clientId: clientId })
+            .populate('clientId')
+            .populate({
+                path: 'requestedServices',
+                populate: [
+                    { path: 'serviceId', model: 'Service' },
+                    { path: 'selectedEmployee', model: 'Employee' }
+                ]
+            });
+        return populatedAppointment;
+    } catch (error) {
+        throw error
     }
 };
 
