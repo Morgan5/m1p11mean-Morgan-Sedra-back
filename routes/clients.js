@@ -92,6 +92,40 @@ router.get('/all', passport.authenticate('jwt', {session:false}),async (req, res
     }
 }); 
 
+//All clients full
+router.get('/full',async (req, res, next) =>{
+    try {
+        const clientList = await Client.getAllClientsFull();
+        res.json({
+            success:true,
+            data:clientList
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+          });
+    }
+}); 
+
+//client full by id
+router.get('/full/:clientId',async (req, res, next) =>{
+    try {
+        const clientId = req.params.clientId;
+        const clientList = await Client.getAllClientsFullById(clientId);
+        res.json({
+            success:true,
+            data:clientList
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+          });
+    }
+}); 
+
+
 // Delete client
 router.delete('/delete/:clientId',async (req, res) =>{
     try {
@@ -146,5 +180,26 @@ router.get('/manager/all',async (req, res, next) =>{
     }
 }); 
 
+// ajout et modification préférence client
+router.post('/preferences/:clientId', async (req, res, next) => {
+    try {
+        const clientId = req.params.clientId;
+        const serviceId = req.body.serviceId;
+        const employeeId = req.body.employeeId;
+
+        const savedPreferenceClient = await Client.addPreferenceClient(clientId, serviceId, employeeId);
+        if (savedPreferenceClient === null) {
+            res.status(404).json({ message: 'Client not found' });
+        } else {
+            res.status(200).json({
+                message: 'Client preference added successfully',
+                data: savedPreferenceClient
+            });
+        }
+    } catch (err) {
+        console.error('Erreur lors de l ajout de la préférence :', err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;
