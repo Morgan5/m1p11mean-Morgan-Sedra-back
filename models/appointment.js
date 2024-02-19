@@ -53,8 +53,17 @@ module.exports.getFullAppointment = async function () {
 
 // Where status Confirmed
 module.exports.getFullAppointmentConfirmed = async function() {
+    const today = new Date();
+    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 7);
     try {
-        const populatedAppointments = await Appointment.find({ status: 'Confirmed' })
+        const populatedAppointments = await Appointment.find({ 
+            status: 'Confirmed',
+            appointmentDate: {
+                $gte: startOfWeek,
+                $lt: endOfWeek
+            }
+         })
             .populate('clientId')
             .populate({
                 path: 'requestedServices',
@@ -72,8 +81,17 @@ module.exports.getFullAppointmentConfirmed = async function() {
 
 // Where status Cancelled
 module.exports.getFullAppointmentCancelled = async function() {
+    const today = new Date();
+    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 7);
     try {
-        const populatedAppointments = await Appointment.find({ status: 'Cancelled' })
+        const populatedAppointments = await Appointment.find({ 
+            status: 'Cancelled',
+            appointmentDate: {
+                $gte: startOfWeek,
+                $lt: endOfWeek
+            }
+         })
             .populate('clientId')
             .populate({
                 path: 'requestedServices',
@@ -91,16 +109,26 @@ module.exports.getFullAppointmentCancelled = async function() {
 
 // Where status Pending
 module.exports.getFullAppointmentPending = async function() {
+    const today = new Date();
+    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 7);
+
     try {
-        const populatedAppointments = await Appointment.find({ status: 'Pending' })
-            .populate('clientId')
-            .populate({
-                path: 'requestedServices',
-                populate: [
-                    { path: 'serviceId', model: 'Service' },
-                    { path: 'selectedEmployee', model: 'Employee' }
-                ]
-            });
+        const populatedAppointments = await Appointment.find({
+            status: 'Pending',
+            appointmentDate: {
+                $gte: startOfWeek,
+                $lt: endOfWeek
+            }
+        })
+        .populate('clientId')
+        .populate({
+            path: 'requestedServices',
+            populate: [
+                { path: 'serviceId', model: 'Service' },
+                { path: 'selectedEmployee', model: 'Employee' }
+            ]
+        });
 
         return populatedAppointments;
     } catch (error) {
