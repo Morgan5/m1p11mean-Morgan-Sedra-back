@@ -33,6 +33,83 @@ const appointmentSchema = new mongoose.Schema({
 
 const Appointment = module.exports = mongoose.model('Appointment', appointmentSchema);
 
+// Recherche de rendez-vous par nom ou prénom du client
+module.exports.getAppointmentsByClientName = async function (searchTerm) {
+    try {
+        const regex = new RegExp(searchTerm, 'i'); // 'i' pour une recherche insensible à la casse
+
+        const appointments = await Appointment.aggregate([
+            {
+                $lookup: {
+                    from: 'clients',
+                    localField: 'clientId',
+                    foreignField: '_id',
+                    as: 'client'
+                }
+            },
+            {
+                $match: {
+                    $or: [
+                        { 'client.firstName': { $regex: regex } },
+                        { 'client.lastName': { $regex: regex } }
+                    ]
+                }
+            },
+            {
+                $unwind: '$requestedServices'
+            },
+            {
+                $lookup: {
+                    from: 'services',
+                    localField: 'requestedServices.serviceId',
+                    foreignField: '_id',
+                    as: 'requestedServices.service'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'employees',
+                    localField: 'requestedServices.selectedEmployee',
+                    foreignField: '_id',
+                    as: 'requestedServices.selectedEmployee'
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    clientId: { $first: '$clientId' },
+                    appointmentDate: { $first: '$appointmentDate' },
+                    status: { $first: '$status' },
+                    requestedServices: { $push: '$requestedServices' }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    clientId: 1,
+                    appointmentDate: 1,
+                    status: 1,
+                    requestedServices: {
+                        $map: {
+                            input: '$requestedServices',
+                            as: 'rs',
+                            in: {
+                                serviceId: '$$rs.service._id',
+                                selectedEmployee: '$$rs.selectedEmployee',
+                                service: '$$rs.service'
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
+
+        return appointments;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Join with populated
 module.exports.getFullAppointment = async function () {
     try {

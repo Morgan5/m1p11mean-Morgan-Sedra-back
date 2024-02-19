@@ -57,6 +57,19 @@ router.delete('/delete/:serviceId', async (req, res) => {
     }
 });
 
+// Route pour obtenir un service par ID
+router.get('/:serviceId', async (req, res) => {
+    const serviceId = req.params.serviceId;
+  
+    try {
+      const service = await Service.getServiceById(serviceId);
+      res.status(200).json(service);
+    } catch (error) {
+      console.error('Erreur lors de la récupération du service par ID :', error.message);
+      res.status(500).json({ error: 'Erreur interne du serveur' });
+    }
+  });
+
 //Update service
 router.put('/update/:serviceId', async (req, res, next) => {
     try {

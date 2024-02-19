@@ -228,4 +228,17 @@ router.get('/clientAppointments/:clientId',async (req,res)=>{
     }
 });
 
+// Route pour obtenir les rendez-vous par nom ou prénom du client
+router.get('/appointmentsByClient/:searchTerm', async (req, res) => {
+    const searchTerm = req.params.searchTerm;
+
+    try {
+        const appointments = await Appointment.getAppointmentsByClientName(searchTerm);
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des rendez-vous par nom ou prénom du client :', error.message);
+        res.status(500).json({ error: 'Erreur interne du serveur' });
+    }
+});
+
 module.exports = router;

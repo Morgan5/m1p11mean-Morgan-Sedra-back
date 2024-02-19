@@ -28,6 +28,15 @@ const Service = module.exports = mongoose.model('Service',ServiceShema);
 
 module.exports = Service;
 
+// get service by id
+module.exports.getServiceById = async function(serviceId){
+    try {
+        return await Service.findById(serviceId);
+    } catch (error) {
+        throw error
+    }
+}
+
 // All service
 module.exports.getAllServices = async function(){
     try {
