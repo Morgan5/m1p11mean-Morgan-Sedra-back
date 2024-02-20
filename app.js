@@ -35,7 +35,8 @@ const usersRoutes = require('./routes/users');
 const servicesRoutes = require('./routes/service');
 const employeeRoutes = require('./routes/employee');
 const clientsRoutes = require('./routes/clients');
-const appointmentRoutes = require('./routes/appointment')
+const appointmentRoutes = require('./routes/appointment');
+const specialesRoutes = require('./routes/speciales');
 
 // port 3000
 const port = 3000;
@@ -76,6 +77,7 @@ app.use('/services', servicesRoutes);
 app.use('/employees', employeeRoutes);
 app.use('/clients', clientsRoutes);
 app.use('/appointments',appointmentRoutes);
+app.use('/speciales', specialesRoutes);
 
 // index route
 app.get('/', (req, res) => {
