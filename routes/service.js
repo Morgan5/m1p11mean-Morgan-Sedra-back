@@ -5,6 +5,13 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Service = require('../models/service');
 
+
+const checkIsConnected = require('./../middlewares/userConnected');
+// Test 
+router.get('/test',checkIsConnected,async (req,res)=>{
+    res.json("OK, c'est bon");
+});
+
 //All services
 router.get('/all',async (req,res,next)=>{
     try {

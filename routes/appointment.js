@@ -228,16 +228,16 @@ router.get('/clientAppointments/:clientId',async (req,res)=>{
     }
 });
 
-// Route pour obtenir les rendez-vous par nom ou prénom du client
-router.get('/appointmentsByClient/:searchTerm', async (req, res) => {
-    const searchTerm = req.params.searchTerm;
+// Route pour obtenir toutes les réservations d'un employé
+router.get('/employee-appointments/:employeeId', async (req, res) => {
+    const employeeId = req.params.employeeId;
 
     try {
-        const appointments = await Appointment.getAppointmentsByClientName(searchTerm);
-        res.status(200).json(appointments);
+        const appointments = await Appointment.getAllAppointmentsForEmployee(employeeId);
+        res.json(appointments);
     } catch (error) {
-        console.error('Erreur lors de la récupération des rendez-vous par nom ou prénom du client :', error.message);
-        res.status(500).json({ error: 'Erreur interne du serveur' });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des réservations de l\'employé' });
     }
 });
 
