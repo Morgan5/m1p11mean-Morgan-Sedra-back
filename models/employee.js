@@ -41,6 +41,11 @@ const employeeSchema = mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 required: true,
                 ref: 'Service', // Référence correcte ici
+            },
+            appointmentId: {
+                type: mongoose.Schema.Types.ObjectId,
+                required: true,
+                ref: 'Appointment', // Assurez-vous de la référence correcte ici
             }
         }
     ]

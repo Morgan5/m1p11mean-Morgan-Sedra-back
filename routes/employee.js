@@ -90,8 +90,9 @@ router.put('/update/:employeeId', async (req, res) => {
 router.post('/tasksCompleted/:employeeId', async (req, res) => {
     try {
         const employeeId = req.params.employeeId;
-
+        console.log(req.body.appointmentId);
         const newTasksCompleted = {
+            appointmentId: req.body.appointmentId,
             date: new Date(req.body.date), 
             commissionAmount: req.body.commissionAmount,
             serviceId:req.body.serviceId
