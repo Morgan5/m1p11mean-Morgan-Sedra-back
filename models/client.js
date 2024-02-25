@@ -105,11 +105,30 @@ module.exports.getClientByEmail = async function (email) {
     }
 }
 
-// Delete client
+const Appointment = require('./appointment');
+// Delete client 65cf344bcc181f5a763d987a
 module.exports.deleteClient = async function (clientId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-        return await Client.findByIdAndDelete(clientId);
+        const client = await Client.findById(clientId).session(session);
+
+        if (!client) {
+            throw new Error("Client not found");
+        }
+
+        await Client.findByIdAndDelete(clientId).session(session);
+
+        await Appointment.deleteMany({ clientId: client._id }).session(session);
+
+        await session.commitTransaction();
+
+        session.endSession();
+
+        return client;
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         throw error;
     }
 }

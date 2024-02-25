@@ -108,10 +108,28 @@ module.exports.getAllEmployee = async function(){
 
 
 // Delete Employee
+const Appointment = require('./appointment');
 module.exports.deleteEmployee = async function(employeeId){
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-        return await Employee.findByIdAndDelete(employeeId);
+        const employee = await Employee.findById(employeeId).session(session);
+
+        if (!employee) {
+            throw new Error("Employee not found");
+        }
+
+        await Employee.findByIdAndDelete(employeeId).session(session);
+
+        await Appointment.deleteMany({ 'requestedServices.selectedEmployee': employee._id }).session(session);
+
+        await session.commitTransaction();
+
+        session.endSession();
+        return employee;
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         throw error;
     }
 };
@@ -150,7 +168,6 @@ module.exports.createEmployee = async function(newEmployee){
         throw error;
     }
 };  
-
 
 // Create Tasks
 module.exports.createTasksCompleted = async function(employeeId,newTasksCompleted){

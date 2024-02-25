@@ -65,26 +65,27 @@ router.delete('/delete/:appointmentId', async (req, res) => {
 });
 
 // Route pour supprimer un service d'un rendez-vous
-router.delete('/requestedService/:appointmentId', async (req, res) => {
+router.delete('/delete/appointments/:appointmentId/services/:serviceIdToRemove', async (req, res) => {
+    const appointmentId = req.params.appointmentId;
+    const serviceIdToRemove = req.params.serviceIdToRemove;
+
     try {
-        const appointmentId = req.params.appointmentId;
-        const requestedServiceId = req.body.requestedServiceId;
+        const deletedService = await Appointment.deleteRequestedServiceAppointment(appointmentId, serviceIdToRemove);
 
-        const deletedRequestedServiceAppointment = await Appointment.deleteRequestedServiceAppointment(appointmentId, requestedServiceId);
-
-        if (deletedRequestedServiceAppointment === null) {
-            res.status(404).json({ message: 'Appointment not found' });
-        } else {
-            res.status(200).json({
-                message: 'Requested service appointment deleted successfully',
-                data: deletedRequestedServiceAppointment
-            });
+        if (!deletedService) {
+            return res.status(404).json({ message: 'Appointment not found' });
         }
+
+        res.status(200).json({ 
+            message: 'Service demandé supprimé avec succès',
+            data: deletedService
+        });
     } catch (error) {
-        console.error('Erreur lors de la suppression du service du rendez-vous :', error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Erreur lors de la suppression du service demandé :', error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du service demandé' });
     }
 });
+
 
 // Appointments
 router.get('/all', async (req, res) => {
