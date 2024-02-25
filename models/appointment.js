@@ -335,4 +335,43 @@ module.exports.getFullAppointmentByClientId = async function (clientId) {
     }
 };
 
+// le nombre de réservations par jour
+module.exports.getNRPJ = async function(date){
+    try {
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);
+    
+        const count = await Appointment.countDocuments({
+            appointmentDate: { $gte: startOfDay, $lte: endOfDay }
+        });
+    
+        return count;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// le nombre de réservations par mois
+module.exports.getNRPM = async function(date){
+    try {
+        const startOfMonth = new Date(date);
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(startOfMonth.getMonth() + 1);
+        endOfMonth.setDate(0);
+        endOfMonth.setHours(23, 59, 59, 999);
+
+        const count = await Appointment.countDocuments({
+            appointmentDate: { $gte: startOfMonth, $lte: endOfMonth }
+        });
+
+        return count;
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = Appointment;

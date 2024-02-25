@@ -168,3 +168,72 @@ module.exports.createTasksCompleted = async function(employeeId,newTasksComplete
         throw error;
     }
 };
+
+// Fonction pour calculer le temps moyen travaillé par jour pour un employé
+module.exports.tempsMoyenTravailleParJour = async function(employeeId){
+    try {
+        const employee = await Employee.findById(employeeId).populate({
+            path: 'tasksCompleted',
+            populate: [
+                { path: 'serviceId', model: 'Service' }
+            ]
+        });
+
+        const tasks = employee.tasksCompleted;
+
+        const tasksByDay = tasks.reduce((acc, task) => {
+            const date = task.date.toISOString().split('T')[0]; // Récupère la date au format YYYY-MM-DD
+            acc[date] = acc[date] || [];
+            acc[date].push(task);
+            return acc;
+        }, {});
+
+        const totalMinutesByDay = {};
+        for (const date in tasksByDay) {
+            const tasksOfDay = tasksByDay[date];
+            const totalMinutes = tasksOfDay.reduce((acc, task) => acc + task.serviceId.duration, 0);
+            totalMinutesByDay[date] = totalMinutes;
+        }
+
+        const averageMinutesPerDay = Object.values(totalMinutesByDay).reduce((acc, minutes) => acc + minutes, 0) / Object.keys(totalMinutesByDay).length;
+
+        return averageMinutesPerDay;
+    } catch(error) {
+        throw error;
+    }
+}
+
+// Fonction pour calculer le temps moyen travaillé par mois pour un employé
+module.exports.tempsMoyenTravailleParMois = async function(employeeId){
+    try {
+        const employee = await Employee.findById(employeeId).populate({
+            path: 'tasksCompleted',
+            populate: [
+                { path: 'serviceId', model: 'Service' }
+            ]
+        });
+
+        const tasks = employee.tasksCompleted;
+
+        const tasksByMonth = tasks.reduce((acc, task) => {
+            const month = task.date.toISOString().split('-').slice(0, 2).join('-'); // Récupère le mois au format YYYY-MM
+            acc[month] = acc[month] || [];
+            acc[month].push(task);
+            return acc;
+        }, {});
+
+        const totalMinutesByMonth = {};
+        for (const month in tasksByMonth) {
+            const tasksOfMonth = tasksByMonth[month];
+            const totalMinutes = tasksOfMonth.reduce((acc, task) => acc + task.serviceId.duration, 0);
+            totalMinutesByMonth[month] = totalMinutes;
+        }
+
+        const averageMinutesPerMonth = Object.values(totalMinutesByMonth).reduce((acc, minutes) => acc + minutes, 0) / Object.keys(totalMinutesByMonth).length;
+
+        return averageMinutesPerMonth;
+    } catch(error) {
+        throw error;
+    }
+}
+
