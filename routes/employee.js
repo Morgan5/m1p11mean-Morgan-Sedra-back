@@ -148,6 +148,31 @@ router.get('/employee/:empId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Fonction pour calculer le temps moyen travaillé par jour pour un employé
+router.get('/tmtj/:employeeId',async(req,res)=>{
+    const employeeId = req.params.employeeId;
+    try {
+        const tmtj = await Employee.tempsMoyenTravailleParJour(employeeId);
+        res.status(200).json(tmtj);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des informations de tmtj:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Fonction pour calculer le temps moyen travaillé par mois pour un employé
+router.get('/tmtm/:employeeId',async(req,res)=>{
+    const employeeId = req.params.employeeId;
+    try {
+        const tmtm = await Employee.tempsMoyenTravailleParMois(employeeId);
+        res.status(200).json(tmtm);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des informations de tmtm:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
   
 
 const checkIsConnected = require('./../middlewares/employeeConnected');

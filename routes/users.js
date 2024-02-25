@@ -87,4 +87,52 @@ router.get('/all', checkIsConnected,async (req, res, next) =>{
 }); 
 
 
+// Fonction pour calculer le chiffre d'affaires par jour
+router.get('/capj', async (req, res) => {
+    const date = req.query.date;
+    try {
+        const chiffreAffaireParJour = await User.chiffreAffairesParJour(date);
+        res.json(chiffreAffaireParJour);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des capj' });
+    }
+});
+
+// Fonction pour calculer le chiffre d'affaires par mois
+router.get('/capm', async (req, res) => {
+    const date = req.query.date;
+    try {
+        const chiffreAffaireParMois = await User.chiffreAffairesParMois(date);
+        res.json(chiffreAffaireParMois);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des capm' });
+    }
+});
+
+// Fonction pour calculer le bénéfice par jour
+router.get('/bpj', async (req, res) => {
+    const date = req.query.date;
+    try {
+        const beneficeParJour = await User.beneficeParJour(date);
+        res.json(beneficeParJour);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des bpj' });
+    }
+});
+
+// Fonction pour calculer le bénéfice par mois
+router.get('/bpm', async (req, res) => {
+    const date = req.query.date;
+    try {
+        const beneficeParMois = await User.beneficeParMois(date);
+        res.json(beneficeParMois);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des bpm' });
+    }
+});
+
 module.exports = router;
