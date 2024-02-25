@@ -74,6 +74,11 @@ module.exports.getAllEmployeeId = async function (empId) {
 // Update 
 module.exports.updateEmployee = async function(employeeId,updatedEmployee){
     try {
+        if (updatedEmployee.password) {
+            // Hasher le nouveau mot de passe
+            updatedEmployee.password = await bcrypt.hash(updatedEmployee.password, 10);
+        }
+
         const result = await Employee.findByIdAndUpdate(
             employeeId,
             {
