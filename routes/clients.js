@@ -4,6 +4,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Client = require('../models/client');
+const mailer = require('../config/mailer');
 
 // Inscription
 router.post('/register', async (req, res, next) => {
@@ -23,6 +24,8 @@ router.post('/register', async (req, res, next) => {
                 // mbola apina le attribut ambony
             });
             const savedClient = await Client.addClient(newClient);
+            const text = 'Cher(e) '+newClient.firstName+', Bienvenue dans Beauty Momo ! Nous sommes ravis de vous avoir parmi nous. Votre inscription a été un succès, et vous êtes désormais membre de notre communauté. Nous sommes impatients de vous offrir une expérience exceptionnelle.';
+            await mailer.sendAppointmentConfirmationEmail(newClient.email,'Création de compte',text);
             res.json({ success: true, msg: 'Client registered', client: savedClient });
         }
     } catch (err) {

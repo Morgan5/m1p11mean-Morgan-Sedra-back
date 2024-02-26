@@ -3,6 +3,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Appointment = require('../models/appointment');
+const Client = require('../models/client'); 
+const mailer = require('../config/mailer');
 
 // Create appointment
 router.post('/create', async (req, res) => {
@@ -13,11 +15,19 @@ router.post('/create', async (req, res) => {
             appointmentDate: req.body.appointmentDate,
             status: req.body.status
         };
+
         const newAppointment = await Appointment.createAppointment(appointmentData);
+        const client = await Client.findById(appointmentData.clientId);
+
+        const emailSubject = 'Création de rendez-vous';
+        const emailText = 'Cher(e) '+client.firstName+', Votre rendez-vous a été bien enregistré.';
+
+        await mailer.sendAppointmentConfirmationEmail(client.email, emailSubject, emailText);
+
         res.status(201).json(newAppointment);
     } catch (error) {
         console.error('Error creating appointment:', error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 });
 
@@ -212,10 +222,21 @@ router.put('/updateStatus/:appointmentId', async (req, res) => {
     }
 });
 
-router.get('/test', async (req, res) => {
-    res.json({
-        message: "Test fotsiny!"
-    });
+
+//JUST TEST
+
+router.get('/test/email', async (req, res) => {
+    try {
+        await mailer.sendAppointmentConfirmationEmail('ranaivoarisoasedra@hotmail.com', 'Test email node', 'Pas de texte');
+        res.json({
+            message: "Test réussi!"
+        });
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi de l\'e-mail :', error);
+        res.status(500).json({
+            error: 'Erreur lors de l\'envoi de l\'e-mail'
+        });
+    }
 });
 
 // Get appointment by client id
